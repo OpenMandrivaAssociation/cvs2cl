@@ -12,6 +12,7 @@ Source1: %{url}/changelogs.html
 License: GPL
 Group: Development/Other
 URL: %url
+BuildRoot: %{_tmppath}/%{name}-buildroot
 BuildArchitectures: noarch
 
 %description
