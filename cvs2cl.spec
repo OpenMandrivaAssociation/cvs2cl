@@ -1,6 +1,6 @@
 %define name cvs2cl
 %define version 2.72
-%define release %mkrel 1
+%define release 2
 %define url http://www.red-bean.com/cvs2cl/
 
 Summary: Generator of ChangeLog(s) from `cvs log` output
