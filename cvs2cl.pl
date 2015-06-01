@@ -9,8 +9,8 @@ exec perl -w -x "$0" ${1+"$@"} # -*- mode: perl; perl-indent-level: 2; -*-
 ###                                                        ###
 ##############################################################
 
-## $Revision: 2.71 $
-## $Date: 2008-05-17 13:25:54 $
+## $Revision: 2.73 $
+## $Date: 2011/11/12 01:27:48 $
 ## $Author: kfogel $
 ##
 
@@ -143,7 +143,7 @@ use User::pwent    qw( getpwnam );
 # Globals --------------------------------------------------------------------
 
 # In case we have to print it out:
-my $VERSION = '$Revision: 2.71 $';
+my $VERSION = '$Revision: 2.73 $';
 $VERSION =~ s/\S+\s+(\S+)\s+\S+/$1/;
 
 ## Vars set by options:
@@ -215,6 +215,9 @@ my $After_Header = " ";
 
 # XML Encoding
 my $XML_Encoding = '';
+
+# XML Stylesheet file
+my $XML_Stylesheet = '';
 
 # Format more for programs than for humans.
 my $XML_Output = 0;
@@ -842,11 +845,15 @@ sub output_header {
   my $version     = 'version="1.0"';
   my $declaration =
     sprintf '<?xml %s?>', join ' ', grep length, $version, $encoding;
+  my $stylesheet  =
+    length $XML_Stylesheet ?
+       sprintf '<?xml-stylesheet type="text/xsl" href="%s"?>', $XML_Stylesheet :
+       '';
   my $root        =
     $No_XML_Namespace ?
-      '<changelog>'     :
-        '<changelog xmlns="http://www.red-bean.com/xmlns/cvs2cl/">';
-  print $fh "$declaration\n\n$root\n\n";
+      '<changelog>'   :
+      '<changelog xmlns="http://www.red-bean.com/xmlns/cvs2cl/">';
+  print $fh "$declaration\n$stylesheet\n\n$root\n\n";
 }
 
 # -------------------------------------
@@ -971,6 +978,7 @@ sub output_tagdate {
 
   print $fh "<tagdate>\n";
   print $fh "<tagisodate>$isoDate</tagisodate>\n";
+  $tag = $self->escape($tag);     # more paranoia
   print $fh "<tagdatetag>$tag</tagdatetag>\n";
   print $fh "</tagdate>\n\n";
   return;
@@ -2505,7 +2513,6 @@ sub common_path_prefix {
 }
 
 # -------------------------------------
-
 sub parse_options {
   # Check this internally before setting the global variable.
   my $output_file;
@@ -2554,6 +2561,7 @@ sub parse_options {
              'follow|F=s'     => \@Follow_Branches,
              'follow-only=s'  => \@Follow_Only,
              'xml-encoding=s' => \$XML_Encoding,
+             'xml-stylesheet=s' => \$XML_Stylesheet,
              'xml'            => \$XML_Output,
              'noxmlns'        => \$No_XML_Namespace,
              'no-xml-iso-date' => \$No_XML_ISO_Date,
@@ -2988,9 +2996,13 @@ Get ChangeLog header from I<FILE> ("B<->" means stdin).
 
 Output XML instead of ChangeLog format (incompatible with B<--accum>).
 
-=item B<--xml-encoding> I<ENCODING.>
+=item B<--xml-encoding> I<ENCODING>
 
 Insert encoding clause in XML header.
+
+=item B<--xml-stylesheet> I<FILE>
+
+Insert xml-stylesheet processing instruction with I<FILE> formatting stylesheet file path in XML header.
 
 =item B<--noxmlns>
 
@@ -3208,7 +3220,7 @@ Contributions from
 
 =head1 BUGS
 
-Please report bugs to C<bug-cvs2cl@red-bean.com>.
+Please report bugs to C<cvs2cl-reports {_AT_} red-bean.com>.
 
 =head1 PREREQUISITES
 
@@ -3225,9 +3237,9 @@ Version_Control/CVS
 
 =head1 COPYRIGHT
 
-(C) 2001,2002,2003,2004 Martyn J. Pearce <fluffy@cpan.org>, under the GNU GPL.
+(C) 2001,2002,2003,2004 Martyn J. Pearce, under the GNU GPL.
 
-(C) 1999 Karl Fogel <kfogel@red-bean.com>, under the GNU GPL.
+(C) 1999 Karl Fogel, under the GNU GPL.
 
 cvs2cl.pl is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
